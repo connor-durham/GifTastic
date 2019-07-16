@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href='http://fonts.googleapis.com/css?family=Oleo+Script' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <title>GifTastic</title>
+</head>
+<style>
+    button {
+        margin:10px;
+    }
+
+    .giffies {
+        padding: 40px;
+    }
+
+    .flex-container {
+        margin-right: 11%;
+        margin-left: 11%;
+        text-align: center
+    }
+
+    #addbutton {
+        padding-top: 20px;
+    }
+
+</style>
+<body>
+
+<div class="flex-container">
+
+        <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                  <h1 class="display-4">Fun with GIPHY!</h1>
+                  <p class="lead">Click the buttons to show some gifs, or add more buttons if you'd like</p>
+                  <p class="lead">Here are some different football teams as an example</p>
+                </div>
+              </div>
+
+        <div class="row justify-content-end">
+             <div id="buttons"></div>
+        </div>
+    
+
+    <hr>
+
+    <div class="row">
+        <div id="gifs" class="col-9"></div>
+        <div id="addbutton" class="col-3">
+                <form>
+                        <div class="form-group">
+                          <label for="exampleInputPassword1">Add a football team!</label>
+                          <input type="form-control" class="form-control" id="userinput" placeholder="Florida Gators">
+                        </div>
+                        <button type="submit" class="btn btn-primary submitter">Submit</button>
+                </form>
+        </div>
+    </div>
+</div>
+
+
+    <script type="text/javascript">
+
+        let topics = ["Green Bay Packers", "Chicago Bears", "Oakland Raiders", "Denver Broncos", "Jacksonville Jaguars", "Buffalo Bills", "New York Giants", "Atlanta Falcons", "Pittsburgh Steelers", "Detroit Lions"]
+      
+        for (let i=0;i<topics.length;i++) {
+            let team = $("<button>");
+            team.text(topics[i])
+            team.attr("class", "btn btn-primary btn-lg");
+            team.addClass("grabber");
+            team.on("click", grabber)
+            $("#buttons").append(team)
+          
+        }
+
+        $(".submitter").on("click", function() {
+
+            event.preventDefault()
+
+            let team = $("<button>");
+            let tester = $("#userinput").val().trim()
+
+            team.text(tester)
+            team.attr("class", "btn btn-primary btn-lg");
+            team.addClass("grabber");
+            team.on("click", grabber)
+            $("#buttons").append(team)
+            topics.push(tester)
+         
+     
+        });
+
+        function grabber() {
+
+            $("#gifs").empty()
+          
+            let search = $(this).text()
+
+                console.log(search)
+
+                var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=nlej46ZzxdfHCmawMKRz9C3GM4wcw35T&q=" + search + "&limit=10&offset=0&rating=PG-13&lang=en";
+            
+                $.ajax({
+
+                    url: queryURL,
+                    method: "GET"
+
+
+                }).then(function(response) {
+
+
+                    for (let i=0;i<response.data.length;i++) {
+
+                        var stillurl = response.data[i].images.fixed_height_still.url;
+
+                        var animatedurl =  response.data[i].images.fixed_height.url
+
+                        var gifimage = $("<img>");
+
+                        gifimage.attr("still", stillurl)
+
+                        gifimage.attr("animated", animatedurl);
+
+                        gifimage.attr("src", stillurl)
+
+                        gifimage.addClass("giffies");
+
+                        gifimage.addClass("notmoving");
+
+                        $("#gifs").append(gifimage)
+                    }
+
+                    $(".giffies").on("click", function() {
+
+
+                        if ($(this).hasClass('notmoving')) {
+
+                            $(this).attr("src", $(this).attr("animated"))
+                            $(this).removeClass('notmoving')
+
+                        }
+                        
+                        else {
+                            $(this).attr("src", $(this).attr("still"))
+                            $(this).addClass('notmoving')
+
+                        }
+
+            
+                    });
+                   
+
+                });
+             }
+
+
+      </script>
+    
+</body>
+</html> 
